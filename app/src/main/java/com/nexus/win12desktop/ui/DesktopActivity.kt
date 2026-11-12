@@ -1,63 +1,43 @@
 package com.nexus.win12desktop.ui
 
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
-import android.app.AlertDialog
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.provider.Settings
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.animation.LinearInterpolator
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.FrameLayout
-import android.widget.GridLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.nexus.win12desktop.NexusApplication
 import com.nexus.win12desktop.R
 import com.nexus.win12desktop.mouse.VirtualMouseManager
-import com.nexus.win12desktop.utils.AppInfo
-import com.nexus.win12desktop.utils.AppUtils
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
+/**
+ * Loads the official Win12 Online desktop (1:1 web UI)
+ * and overlays a TV remote virtual mouse.
+ *
+ * Source: https://win12-online.github.io/win12/desktop.html
+ */
 class DesktopActivity : AppCompatActivity() {
 
     private lateinit var rootContainer: FrameLayout
-    private lateinit var wallpaperView: ImageView
-    private lateinit var taskbar: LinearLayout
-    private lateinit var startButton: ImageView
-    private lateinit var clockText: TextView
-    private lateinit var dateText: TextView
-    private lateinit var desktopIconsContainer: GridLayout
-    private lateinit var startMenuPanel: View
-    private lateinit var appListRecycler: RecyclerView
-    private lateinit var statusBar: LinearLayout
+    private lateinit var webView: WebView
+    private lateinit var loadingOverlay: View
 
     private var mouseManager: VirtualMouseManager? = null
-    private var isStartMenuOpen = false
-    private val timeHandler = Handler(Looper.getMainLooper())
-    private val timeRunnable = object : Runnable {
-        override fun run() {
-            updateClock()
-            timeHandler.postDelayed(this, 1000)
-        }
+
+    companion object {
+        private const val WIN12_URL = "https://win12-online.github.io/win12/desktop.html"
     }
 
-    private var wallpaperAnimator: ObjectAnimator? = null
-
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -76,90 +56,78 @@ class DesktopActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_desktop)
 
-        bindViews()
-        setupDesktop()
-        setupTaskbar()
-        setupStartMenu()
-        setupMouse()
-        startClock()
-        startWallpaperAnimation()
-    }
-
-    private fun bindViews() {
         rootContainer = findViewById(R.id.root_container)
-        wallpaperView = findViewById(R.id.wallpaper)
-        taskbar = findViewById(R.id.taskbar)
-        startButton = findViewById(R.id.start_button)
-        clockText = findViewById(R.id.clock_text)
-        dateText = findViewById(R.id.date_text)
-        desktopIconsContainer = findViewById(R.id.desktop_icons)
-        startMenuPanel = findViewById(R.id.start_menu_panel)
-        appListRecycler = findViewById(R.id.app_list_recycler)
-        statusBar = findViewById(R.id.status_bar)
+        webView = findViewById(R.id.win12_webview)
+        loadingOverlay = findViewById(R.id.loading_overlay)
+
+        setupWebView()
+        setupMouse()
+
+        webView.loadUrl(WIN12_URL)
     }
 
-    private fun setupDesktop() {
-        val apps = AppUtils.getLaunchableApps(this)
-        desktopIconsContainer.removeAllViews()
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun setupWebView() {
+        val settings = webView.settings
+        settings.javaScriptEnabled = true
+        settings.domStorageEnabled = true
+        settings.databaseEnabled = true
+        settings.allowFileAccess = true
+        settings.allowContentAccess = true
+        settings.mediaPlaybackRequiresUserGesture = false
+        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+        settings.cacheMode = WebSettings.LOAD_DEFAULT
+        settings.useWideViewPort = true
+        settings.loadWithOverviewMode = true
+        settings.builtInZoomControls = false
+        settings.displayZoomControls = false
+        settings.setSupportZoom(false)
+        settings.userAgentString = settings.userAgentString + " NexusWin12TV/1.0"
 
-        apps.take(16).forEachIndexed { index, app ->
-            val iconView = LayoutInflater.from(this)
-                .inflate(R.layout.item_desktop_icon, desktopIconsContainer, false)
-
-            val iconImage = iconView.findViewById<ImageView>(R.id.icon_image)
-            val iconLabel = iconView.findViewById<TextView>(R.id.icon_label)
-
-            iconImage.setImageDrawable(app.icon)
-            iconLabel.text = app.label
-
-            iconView.setOnClickListener { launchApp(app) }
-            iconView.setOnLongClickListener {
-                showAppContextMenu(app)
-                true
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                loadingOverlay.visibility = View.VISIBLE
             }
 
-            val params = GridLayout.LayoutParams().apply {
-                width = resources.getDimensionPixelSize(R.dimen.desktop_icon_size)
-                height = ViewGroup.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(index % 8)
-                rowSpec = GridLayout.spec(index / 8)
-                setMargins(12, 16, 12, 16)
+            override fun onPageFinished(view: WebView?, url: String?) {
+                loadingOverlay.visibility = View.GONE
+                view?.evaluateJavascript(
+                    "(function(){try{document.documentElement.classList.add('dark');}catch(e){}})();",
+                    null
+                )
+                mouseManager?.updateScreenSize()
             }
-            desktopIconsContainer.addView(iconView, params)
-        }
-    }
 
-    private fun setupTaskbar() {
-        startButton.setOnClickListener { toggleStartMenu() }
-        taskbar.alpha = 0.96f
-    }
-
-    private fun setupStartMenu() {
-        startMenuPanel.visibility = View.GONE
-        isStartMenuOpen = false
-
-        val apps = AppUtils.getLaunchableApps(this)
-        appListRecycler.layoutManager = GridLayoutManager(this, 6)
-        appListRecycler.adapter = AppListAdapter(apps) { app ->
-            closeStartMenu()
-            launchApp(app)
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                val url = request?.url?.toString() ?: return false
+                return if (url.contains("win12-online.github.io") || url.contains("win12")) {
+                    false
+                } else {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, request?.url))
+                    } catch (_: Exception) {}
+                    true
+                }
+            }
         }
 
-        findViewById<View>(R.id.btn_settings)?.setOnClickListener {
-            closeStartMenu()
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
-        findViewById<View>(R.id.btn_power)?.setOnClickListener {
-            Toast.makeText(this, "\u957f\u6309\u7535\u6e90\u952e\u6216\u4f7f\u7528\u7cfb\u7edf\u8bbe\u7f6e\u5173\u673a", Toast.LENGTH_SHORT).show()
-        }
+        webView.webChromeClient = WebChromeClient()
     }
 
     private fun setupMouse() {
         mouseManager = VirtualMouseManager(this, rootContainer).apply {
             listener = object : VirtualMouseManager.MouseListener {
-                override fun onLeftClick(x: Float, y: Float) {}
-                override fun onRightClick(x: Float, y: Float) {}
+                override fun onLeftClick(x: Float, y: Float) {
+                    injectClickToWebView(x, y, rightClick = false)
+                }
+
+                override fun onRightClick(x: Float, y: Float) {
+                    injectClickToWebView(x, y, rightClick = true)
+                }
+
                 override fun onMouseMove(x: Float, y: Float) {}
             }
             isEnabled = NexusApplication.getPrefs(this@DesktopActivity)
@@ -167,129 +135,56 @@ class DesktopActivity : AppCompatActivity() {
         }
     }
 
-    private fun startClock() {
-        updateClock()
-        timeHandler.post(timeRunnable)
-    }
+    private fun injectClickToWebView(screenX: Float, screenY: Float, rightClick: Boolean) {
+        val loc = IntArray(2)
+        webView.getLocationOnScreen(loc)
+        val x = screenX - loc[0]
+        val y = screenY - loc[1]
+        if (x < 0 || y < 0 || x > webView.width || y > webView.height) return
 
-    private fun updateClock() {
-        val now = Date()
-        clockText.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
-        dateText.text = SimpleDateFormat("MM\u6708dd\u65e5", Locale.CHINA).format(now)
-    }
+        val density = resources.displayMetrics.density
+        val cssX = x / density
+        val cssY = y / density
 
-    private fun startWallpaperAnimation() {
-        wallpaperAnimator = ObjectAnimator.ofFloat(wallpaperView, "scaleX", 1.0f, 1.05f).apply {
-            duration = 20000
-            repeatMode = ValueAnimator.REVERSE
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            start()
-        }
-        ObjectAnimator.ofFloat(wallpaperView, "scaleY", 1.0f, 1.05f).apply {
-            duration = 20000
-            repeatMode = ValueAnimator.REVERSE
-            repeatCount = ValueAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            start()
-        }
-    }
-
-    private fun toggleStartMenu() {
-        if (isStartMenuOpen) closeStartMenu() else openStartMenu()
-    }
-
-    private fun openStartMenu() {
-        startMenuPanel.visibility = View.VISIBLE
-        startMenuPanel.alpha = 0f
-        startMenuPanel.scaleX = 0.92f
-        startMenuPanel.scaleY = 0.92f
-        startMenuPanel.translationY = 24f
-        startMenuPanel.animate()
-            .alpha(1f)
-            .scaleX(1f)
-            .scaleY(1f)
-            .translationY(0f)
-            .setDuration(200)
-            .start()
-        isStartMenuOpen = true
-    }
-
-    private fun closeStartMenu() {
-        startMenuPanel.animate()
-            .alpha(0f)
-            .scaleX(0.94f)
-            .scaleY(0.94f)
-            .translationY(16f)
-            .setDuration(160)
-            .withEndAction { startMenuPanel.visibility = View.GONE }
-            .start()
-        isStartMenuOpen = false
-    }
-
-    private fun launchApp(app: AppInfo) {
-        try {
-            val intent = packageManager.getLaunchIntentForPackage(app.packageName)
-            if (intent != null) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, "\u65e0\u6cd5\u542f\u52a8 ${app.label}", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "\u542f\u52a8\u5931\u8d25: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun showAppContextMenu(app: AppInfo) {
-        val options = arrayOf("\u6253\u5f00", "\u5e94\u7528\u4fe1\u606f", "\u5378\u8f7d")
-        AlertDialog.Builder(this, R.style.Theme_NexusWin12_Dialog)
-            .setTitle(app.label)
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> launchApp(app)
-                    1 -> openAppInfo(app.packageName)
-                    2 -> uninstallApp(app.packageName)
-                }
-            }
-            .show()
-    }
-
-    private fun openAppInfo(packageName: String) {
-        try {
-            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:$packageName")
-            })
-        } catch (e: Exception) {
-            Toast.makeText(this, "\u65e0\u6cd5\u6253\u5f00\u5e94\u7528\u4fe1\u606f", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun uninstallApp(packageName: String) {
-        try {
-            startActivity(Intent(Intent.ACTION_DELETE).apply {
-                data = Uri.parse("package:$packageName")
-            })
-        } catch (e: Exception) {
-            Toast.makeText(this, "\u65e0\u6cd5\u5378\u8f7d", Toast.LENGTH_SHORT).show()
-        }
+        val button = if (rightClick) 2 else 0
+        val js = """
+            (function(){
+              var el = document.elementFromPoint($cssX, $cssY);
+              if (!el) return;
+              var opts = {bubbles:true, cancelable:true, view:window, clientX:$cssX, clientY:$cssY, button:$button};
+              el.dispatchEvent(new MouseEvent('mousedown', opts));
+              el.dispatchEvent(new MouseEvent('mouseup', opts));
+              el.dispatchEvent(new MouseEvent('click', opts));
+              if ($button === 2) {
+                el.dispatchEvent(new MouseEvent('contextmenu', opts));
+              }
+            })();
+        """.trimIndent()
+        webView.evaluateJavascript(js, null)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (event == null) return super.onKeyDown(keyCode, event)
+
         mouseManager?.let {
             if (it.isEnabled && it.onKeyDown(keyCode, event)) return true
         }
+
         return when (keyCode) {
             KeyEvent.KEYCODE_HOME -> true
             KeyEvent.KEYCODE_BACK -> {
-                if (isStartMenuOpen) { closeStartMenu(); true }
-                else {
-                    Toast.makeText(this, "\u5df2\u5728\u684c\u9762", Toast.LENGTH_SHORT).show()
+                if (webView.canGoBack()) {
+                    webView.goBack()
+                    true
+                } else {
+                    Toast.makeText(this, "\u5df2\u5728 Windows 12 \u684c\u9762", Toast.LENGTH_SHORT).show()
                     true
                 }
             }
-            KeyEvent.KEYCODE_MENU -> { toggleStartMenu(); true }
+            KeyEvent.KEYCODE_MENU -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
             else -> super.onKeyDown(keyCode, event)
         }
     }
@@ -304,45 +199,23 @@ class DesktopActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        webView.onResume()
         mouseManager?.updateScreenSize()
-        setupDesktop()
+    }
+
+    override fun onPause() {
+        webView.onPause()
+        super.onPause()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        timeHandler.removeCallbacks(timeRunnable)
-        wallpaperAnimator?.cancel()
         mouseManager?.destroy()
+        webView.destroy()
+        super.onDestroy()
     }
 
     override fun onBackPressed() {
-        if (isStartMenuOpen) closeStartMenu()
-        else Toast.makeText(this, "NEXUS WIN12", Toast.LENGTH_SHORT).show()
+        if (webView.canGoBack()) webView.goBack()
+        else Toast.makeText(this, "NEXUS WIN12 DESKTOP", Toast.LENGTH_SHORT).show()
     }
-}
-
-class AppListAdapter(
-    private val apps: List<AppInfo>,
-    private val onClick: (AppInfo) -> Unit
-) : RecyclerView.Adapter<AppListAdapter.ViewHolder>() {
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val icon: ImageView = view.findViewById(R.id.app_icon)
-        val label: TextView = view.findViewById(R.id.app_label)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_app_grid, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val app = apps[position]
-        holder.icon.setImageDrawable(app.icon)
-        holder.label.text = app.label
-        holder.itemView.setOnClickListener { onClick(app) }
-    }
-
-    override fun getItemCount() = apps.size
 }
