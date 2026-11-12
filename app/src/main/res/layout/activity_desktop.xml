@@ -10,16 +10,13 @@
 
     <GridLayout android:id="@+id/desktop_icons" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginStart="28dp" android:layout_marginTop="28dp" android:layout_marginEnd="28dp" android:layout_marginBottom="70dp" android:columnCount="8" android:alignmentMode="alignBounds" android:useDefaultMargins="false" />
 
-    <LinearLayout android:id="@+id/start_menu_panel" android:layout_width="720dp" android:layout_height="520dp" android:layout_gravity="bottom|center_horizontal" android:layout_marginBottom="62dp" android:background="@drawable/bg_start_menu" android:orientation="horizontal" android:visibility="gone" android:elevation="20dp">
+    <LinearLayout android:id="@+id/start_menu_panel" android:layout_width="860dp" android:layout_height="560dp" android:layout_gravity="bottom|center_horizontal" android:layout_marginBottom="62dp" android:background="@drawable/bg_start_menu" android:orientation="horizontal" android:visibility="gone" android:elevation="20dp">
         <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1.15" android:orientation="vertical" android:padding="16dp">
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="12dp">
                 <TextView android:layout_width="36dp" android:layout_height="36dp" android:gravity="center" android:background="@drawable/bg_theme_btn" android:text="A" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="16sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:text="Administrator" android:textColor="#EEEEEE" android:textSize="14sp" android:textStyle="bold" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u53ef\u7528" android:textColor="#AAAAAA" android:textSize="12sp" />
             </LinearLayout>
-            <TextView android:layout_width="match_parent" android:layout_height="40dp" android:background="@drawable/bg_search" android:gravity="center_vertical" android:paddingHorizontal="14dp" android:text="\u5728\u8fd9\u91cc\u8f93\u5165\u4f60\u8981\u641c\u7d22\u7684\u5185\u5bb9" android:textColor="#AAAAAA" android:textSize="13sp" android:layout_marginBottom="8dp" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u6240\u6709\u5e94\u7528" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="6dp" />
+            <TextView android:layout_width="match_parent" android:layout_height="40dp" android:background="@drawable/bg_search" android:gravity="center_vertical" android:paddingHorizontal="14dp" android:text="\u5728\u8fd9\u91cc\u8f93\u5165\u4f60\u8981\u641c\u7d22\u7684\u5185\u5bb9" android:textColor="#AAAAAA" android:textSize="13sp" android:layout_marginBottom="10dp" />
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/app_list_recycler" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:overScrollMode="never" />
         </LinearLayout>
         <View android:layout_width="1dp" android:layout_height="match_parent" android:layout_marginVertical="20dp" android:background="#333333" />
@@ -53,11 +50,11 @@
 
     <include layout="@layout/panel_control_center" />
 
-    <LinearLayout android:id="@+id/dock_box" android:layout_width="match_parent" android:layout_height="56dp" android:layout_gravity="bottom" android:gravity="center_horizontal|bottom" android:orientation="horizontal" android:paddingBottom="10dp" android:paddingHorizontal="8dp">
+    <LinearLayout android:id="@+id/dock_box" android:layout_width="match_parent" android:layout_height="56dp" android:layout_gravity="bottom" android:gravity="center" android:paddingBottom="10dp" android:orientation="horizontal">
         <LinearLayout android:id="@+id/widgets_btn" android:layout_width="44dp" android:layout_height="44dp" android:background="@drawable/bg_dock" android:gravity="center" android:layout_marginEnd="6dp" android:elevation="12dp">
             <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_widgets" android:contentDescription="widgets" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/taskbar" android:layout_width="wrap_content" android:layout_height="44dp" android:background="@drawable/bg_dock" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="6dp" android:elevation="12dp" android:minWidth="200dp">
+        <LinearLayout android:id="@+id/taskbar" android:layout_width="wrap_content" android:layout_height="44dp" android:background="@drawable/bg_dock" android:orientation="horizontal" android:gravity="center_vertical" android:paddingHorizontal="8dp" android:elevation="12dp" android:minWidth="200dp">
             <ImageView android:id="@+id/start_button" android:layout_width="40dp" android:layout_height="40dp" android:padding="8dp" android:src="@drawable/ic_start" android:background="@drawable/bg_dock_btn" android:contentDescription="start" android:scaleType="fitCenter" />
             <LinearLayout android:id="@+id/dock_apps" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="4dp" />
         </LinearLayout>
