@@ -56,7 +56,10 @@ class DesktopActivity : AppCompatActivity() {
     private var isControlCenterOpen = false
     private val timeHandler = Handler(Looper.getMainLooper())
     private val timeRunnable = object : Runnable {
-        override fun run() { updateClock(); timeHandler.postDelayed(this, 1000) }
+        override fun run() {
+            updateClock()
+            timeHandler.postDelayed(this, 1000)
+        }
     }
     private var wallpaperAnimator: ObjectAnimator? = null
 
@@ -66,9 +69,16 @@ class DesktopActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = (
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+                or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            )
         setContentView(R.layout.activity_desktop)
-        bindViews(); setupDesktop(); setupDock(); setupStartMenu(); setupMouse(); startClock(); startWallpaperAnimation()
+        bindViews()
+        setupDesktop()
+        setupDock()
+        setupStartMenu()
+        setupMouse()
+        startClock()
+        startWallpaperAnimation()
     }
 
     private fun bindViews() {
@@ -162,9 +172,13 @@ class DesktopActivity : AppCompatActivity() {
         isStartMenuOpen = false
         val apps = AppUtils.getLaunchableApps(this)
         appListRecycler.layoutManager = LinearLayoutManager(this)
-        appListRecycler.adapter = AppListAdapter(apps) { app -> closeStartMenu(); launchApp(app) }
+        appListRecycler.adapter = AppListAdapter(apps) { app ->
+            closeStartMenu()
+            launchApp(app)
+        }
         findViewById<View>(R.id.btn_settings)?.setOnClickListener {
-            closeStartMenu(); startActivity(Intent(this, SettingsActivity::class.java))
+            closeStartMenu()
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
         findViewById<View>(R.id.btn_power)?.setOnClickListener {
             Toast.makeText(this, "\u8bf7\u4f7f\u7528\u7cfb\u7edf\u7535\u6e90\u952e", Toast.LENGTH_SHORT).show()
@@ -182,7 +196,10 @@ class DesktopActivity : AppCompatActivity() {
         }
     }
 
-    private fun startClock() { updateClock(); timeHandler.post(timeRunnable) }
+    private fun startClock() {
+        updateClock()
+        timeHandler.post(timeRunnable)
+    }
 
     private fun updateClock() {
         val now = Date()
@@ -208,24 +225,29 @@ class DesktopActivity : AppCompatActivity() {
     private fun openStartMenu() {
         if (isControlCenterOpen) closeControlCenter()
         startMenuPanel.visibility = View.VISIBLE
-        startMenuPanel.alpha = 0f; startMenuPanel.scaleX = 0.94f; startMenuPanel.scaleY = 0.94f; startMenuPanel.translationY = 20f
-        startMenuPanel.animate().alpha(1f).scaleX(1f).scaleY(1f).translationY(0f)
-            .setDuration(180).setInterpolator(DecelerateInterpolator()).start()
+        startMenuPanel.alpha = 0f
+        startMenuPanel.translationY = 80f
+        startMenuPanel.animate().alpha(1f).translationY(0f).setDuration(280)
+            .setInterpolator(DecelerateInterpolator()).start()
         isStartMenuOpen = true
     }
 
     private fun closeStartMenu() {
-        startMenuPanel.animate().alpha(0f).scaleX(0.96f).scaleY(0.96f).translationY(12f)
-            .setDuration(140).withEndAction { startMenuPanel.visibility = View.GONE }.start()
+        startMenuPanel.animate().alpha(0f).translationY(40f).setDuration(180)
+            .withEndAction { startMenuPanel.visibility = View.GONE }.start()
         isStartMenuOpen = false
     }
 
     private fun launchApp(app: AppInfo) {
         try {
             val intent = packageManager.getLaunchIntentForPackage(app.packageName)
-            if (intent != null) { intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); startActivity(intent) }
-            else Toast.makeText(this, "\u65e0\u6cd5\u542f\u52a8 ${app.label}", Toast.LENGTH_SHORT).show()
-        } catch (_: Exception) { Toast.makeText(this, "\u542f\u52a8\u5931\u8d25", Toast.LENGTH_SHORT).show() }
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            } else Toast.makeText(this, "\u65e0\u6cd5\u542f\u52a8 ${app.label}", Toast.LENGTH_SHORT).show()
+        } catch (_: Exception) {
+            Toast.makeText(this, "\u542f\u52a8\u5931\u8d25", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showAppContextMenu(app: AppInfo) {
@@ -234,8 +256,16 @@ class DesktopActivity : AppCompatActivity() {
             .setItems(arrayOf("\u6253\u5f00", "\u5e94\u7528\u4fe1\u606f", "\u5378\u8f7d")) { _, which ->
                 when (which) {
                     0 -> launchApp(app)
-                    1 -> try { startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply { data = Uri.parse("package:${app.packageName}") }) } catch (_: Exception) {}
-                    2 -> try { startActivity(Intent(Intent.ACTION_DELETE).apply { data = Uri.parse("package:${app.packageName}") }) } catch (_: Exception) {}
+                    1 -> try {
+                        startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:${app.packageName}")
+                        })
+                    } catch (_: Exception) {}
+                    2 -> try {
+                        startActivity(Intent(Intent.ACTION_DELETE).apply {
+                            data = Uri.parse("package:${app.packageName}")
+                        })
+                    } catch (_: Exception) {}
                 }
             }.show()
     }
@@ -245,10 +275,12 @@ class DesktopActivity : AppCompatActivity() {
         mouseManager?.let { if (it.isEnabled && it.onKeyDown(keyCode, event)) return true }
         return when (keyCode) {
             KeyEvent.KEYCODE_HOME -> true
-            KeyEvent.KEYCODE_BACK -> when {
-                isStartMenuOpen -> { closeStartMenu(); true }
-                isControlCenterOpen -> { closeControlCenter(); true }
-                else -> { Toast.makeText(this, "\u5df2\u5728\u684c\u9762", Toast.LENGTH_SHORT).show(); true }
+            KeyEvent.KEYCODE_BACK -> {
+                when {
+                    isStartMenuOpen -> { closeStartMenu(); true }
+                    isControlCenterOpen -> { closeControlCenter(); true }
+                    else -> { Toast.makeText(this, "\u5df2\u5728\u684c\u9762", Toast.LENGTH_SHORT).show(); true }
+                }
             }
             KeyEvent.KEYCODE_MENU -> { toggleStartMenu(); true }
             else -> super.onKeyDown(keyCode, event)
@@ -262,11 +294,17 @@ class DesktopActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        super.onResume(); mouseManager?.updateScreenSize(); setupDesktop(); setupDock()
+        super.onResume()
+        mouseManager?.updateScreenSize()
+        setupDesktop()
+        setupDock()
     }
 
     override fun onDestroy() {
-        super.onDestroy(); timeHandler.removeCallbacks(timeRunnable); wallpaperAnimator?.cancel(); mouseManager?.destroy()
+        super.onDestroy()
+        timeHandler.removeCallbacks(timeRunnable)
+        wallpaperAnimator?.cancel()
+        mouseManager?.destroy()
     }
 
     override fun onBackPressed() {
