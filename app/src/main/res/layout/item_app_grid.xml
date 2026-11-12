@@ -2,29 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="10dp"
-    android:background="@drawable/bg_app_tile"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="10dp"
+    android:paddingVertical="8dp"
+    android:background="@drawable/bg_list_item"
     android:clickable="true"
-    android:focusable="true"
-    android:layout_margin="4dp">
+    android:focusable="true">
 
     <ImageView
         android:id="@+id/app_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
         android:scaleType="fitCenter"
         android:contentDescription="@null" />
 
     <TextView
         android:id="@+id/app_label"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:textColor="#E8E8E8"
-        android:textSize="11sp"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:gravity="center" />
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:textColor="#EEEEEE"
+        android:textSize="13sp"
+        android:maxLines="1"
+        android:ellipsize="end" />
 </LinearLayout>
