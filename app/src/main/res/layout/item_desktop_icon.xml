@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="96dp"
+    android:layout_width="88dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:padding="8dp"
-    android:background="?attr/selectableItemBackgroundBorderless"
+    android:padding="6dp"
+    android:background="@drawable/bg_taskbar_icon"
     android:clickable="true"
     android:focusable="true">
 
     <ImageView
         android:id="@+id/icon_image"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:scaleType="fitCenter"
         android:contentDescription="@null" />
 
     <TextView
         android:id="@+id/icon_label"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:textColor="#FFFFFF"
@@ -26,8 +26,8 @@
         android:maxLines="2"
         android:ellipsize="end"
         android:gravity="center"
-        android:shadowColor="#80000000"
-        android:shadowDx="1"
+        android:shadowColor="#E0000000"
+        android:shadowDx="0"
         android:shadowDy="1"
-        android:shadowRadius="2" />
+        android:shadowRadius="3" />
 </LinearLayout>
