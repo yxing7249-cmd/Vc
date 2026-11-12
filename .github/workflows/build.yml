@@ -24,21 +24,29 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew || true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-      - name: Build Debug APK
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+      - name: Make gradlew executable
         run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew assembleDebug --stacktrace
+          if [ -f gradlew ]; then
+            chmod +x gradlew
           else
-            # Fallback if wrapper not present
-            gradle assembleDebug --stacktrace || echo "Please generate Gradle Wrapper locally"
+            echo "gradlew missing, generating wrapper..."
+            gradle wrapper --gradle-version 8.2
+            chmod +x gradlew
           fi
 
-      - name: Upload APK
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: NEXUS-WIN12-DESKTOP-debug
           path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: warn
+          if-no-files-found: error
+          retention-days: 30
