@@ -2,10 +2,27 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="nexus_bg">#0A0E17</color>
-    <color name="nexus_accent">#3B82F6</color>
-    <color name="nexus_glass">#331A2332</color>
-    <color name="nexus_taskbar">#CC0D1117</color>
-    <color name="nexus_text">#E0E6F0</color>
-    <color name="nexus_text_secondary">#8890A0</color>
+    <color name="win12_bg">#0C0C0E</color>
+    <color name="win12_surface">#1A1A1E</color>
+    <color name="win12_surface_elevated">#252528</color>
+    <color name="win12_acrylic">#CC1C1C20</color>
+    <color name="win12_mica">#F01C1C20</color>
+    <color name="win12_accent">#60CDFF</color>
+    <color name="win12_accent_dark">#0078D4</color>
+    <color name="win12_accent_soft">#3360CDFF</color>
+    <color name="win12_text_primary">#FFFFFF</color>
+    <color name="win12_text_secondary">#C5C5C5</color>
+    <color name="win12_text_tertiary">#8A8A8A</color>
+    <color name="win12_stroke">#33FFFFFF</color>
+    <color name="win12_stroke_strong">#55FFFFFF</color>
+    <color name="win12_divider">#22FFFFFF</color>
+    <color name="win12_taskbar">#E616161A</color>
+    <color name="win12_start_menu">#F01C1C20</color>
+    <color name="win12_hover">#22FFFFFF</color>
+    <color name="nexus_bg">@color/win12_bg</color>
+    <color name="nexus_accent">@color/win12_accent</color>
+    <color name="nexus_glass">@color/win12_acrylic</color>
+    <color name="nexus_taskbar">@color/win12_taskbar</color>
+    <color name="nexus_text">@color/win12_text_primary</color>
+    <color name="nexus_text_secondary">@color/win12_text_secondary</color>
 </resources>
