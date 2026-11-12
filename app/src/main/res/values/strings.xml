@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NEXUS WIN12 DESKTOP</string>
+    <string name="wallpaper">动态壁纸</string>
+    <string name="start">开始</string>
+    <string name="start_menu_title">开始</string>
+    <string name="settings">设置</string>
+    <string name="power">电源</string>
+    <string name="settings_title">NEXUS 设置</string>
+    <string name="section_mouse">虚拟鼠标</string>
+    <string name="mouse_enabled">启用遥控器虚拟鼠标</string>
+    <string name="mouse_speed">鼠标移动速度</string>
+    <string name="back_as_right_click">返回键作为右键</string>
+    <string name="section_system">系统</string>
+    <string name="set_default_launcher">设置为默认桌面启动器</string>
+    <string name="enable_accessibility">启用辅助功能（高级鼠标）</string>
+    <string name="accessibility_note">注意：辅助功能服务可实现有限的系统级点击注入。请仅在信任本应用时开启。虚拟鼠标默认仅在本桌面应用内生效。</string>
+    <string name="back">返回桌面</string>
+    <string name="accessibility_service_description">NEXUS WIN12 虚拟鼠标辅助服务。启用后可在支持的场景下注入点击手势。仅在用户主动开启时工作。</string>
+</resources>

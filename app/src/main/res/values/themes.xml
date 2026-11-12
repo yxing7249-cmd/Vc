@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.NexusWin12" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/nexus_accent</item>
+        <item name="colorPrimaryDark">@color/nexus_bg</item>
+        <item name="colorAccent">@color/nexus_accent</item>
+        <item name="android:windowBackground">@color/nexus_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="Theme.NexusWin12.Fullscreen" parent="Theme.NexusWin12">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="Theme.NexusWin12.Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:background">@color/nexus_bg</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="nexus_bg">#0A0E17</color>
+    <color name="nexus_accent">#3B82F6</color>
+    <color name="nexus_glass">#331A2332</color>
+    <color name="nexus_taskbar">#CC0D1117</color>
+    <color name="nexus_text">#E0E6F0</color>
+    <color name="nexus_text_secondary">#8890A0</color>
+</resources>
