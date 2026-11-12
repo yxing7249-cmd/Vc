@@ -3,8 +3,6 @@ name: Build APK
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -23,25 +21,30 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        with:
+          packages: 'tools platform-tools platforms;android-34 build-tools;34.0.0'
 
       - name: Create local.properties
-        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
-      - name: Make gradlew executable
+      - name: Generate Gradle Wrapper
         run: |
-          if [ -f gradlew ]; then
-            chmod +x gradlew
-          else
-            echo "gradlew missing, generating wrapper..."
-            gradle wrapper --gradle-version 8.2
-            chmod +x gradlew
+          if [ ! -f gradlew ]; then
+            gradle wrapper --gradle-version 8.2 || true
           fi
+          if [ ! -f gradlew ]; then
+            # Fallback: download gradle and create wrapper
+            curl -sL https://services.gradle.org/distributions/gradle-8.2-bin.zip -o /tmp/gradle.zip
+            unzip -q /tmp/gradle.zip -d /tmp
+            /tmp/gradle-8.2/bin/gradle wrapper --gradle-version 8.2
+          fi
+          chmod +x gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: List APK
+        run: find app/build/outputs -name "*.apk" -ls || true
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
