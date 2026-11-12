@@ -11,8 +11,10 @@
     android:padding="16dp"
     android:visibility="gone"
     android:elevation="20dp">
+
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u63a7\u5236\u4e2d\u5fc3" android:textColor="#EEEEEE" android:textSize="14sp" android:textStyle="bold" android:layout_marginBottom="12dp" />
-    <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:columnCount="3" android:alignmentMode="alignBounds" android:useDefaultMargins="true">
+
+    <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:columnCount="3" android:rowCount="2" android:alignmentMode="alignBounds" android:useDefaultMargins="true">
         <LinearLayout android:id="@+id/cc_wifi" android:layout_width="0dp" android:layout_height="72dp" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/bg_cc_tile_on" android:padding="8dp">
             <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_wifi" android:contentDescription="@null" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="WLAN" android:textColor="#FFFFFF" android:textSize="11sp" android:layout_marginTop="4dp" />
@@ -26,18 +28,19 @@
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u98de\u884c\u6a21\u5f0f" android:textColor="#EEEEEE" android:textSize="11sp" android:layout_marginTop="4dp" />
         </LinearLayout>
         <LinearLayout android:id="@+id/cc_eye" android:layout_width="0dp" android:layout_height="72dp" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/bg_cc_tile" android:padding="8dp">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u773c" android:textSize="16sp" android:textColor="#EEEEEE" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\uD83D\uDC41" android:textSize="18sp" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u62a4\u773c\u6a21\u5f0f" android:textColor="#EEEEEE" android:textSize="11sp" android:layout_marginTop="4dp" />
         </LinearLayout>
         <LinearLayout android:id="@+id/cc_hotspot" android:layout_width="0dp" android:layout_height="72dp" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/bg_cc_tile" android:padding="8dp">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u70ed" android:textSize="16sp" android:textColor="#EEEEEE" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\uD83D\uDCE1" android:textSize="18sp" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u79fb\u52a8\u70ed\u70b9" android:textColor="#EEEEEE" android:textSize="11sp" android:layout_marginTop="4dp" />
         </LinearLayout>
         <LinearLayout android:id="@+id/cc_a11y" android:layout_width="0dp" android:layout_height="72dp" android:layout_columnWeight="1" android:orientation="vertical" android:gravity="center" android:background="@drawable/bg_cc_tile" android:padding="8dp">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u8f85" android:textSize="16sp" android:textColor="#EEEEEE" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u267F" android:textSize="18sp" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u8f85\u52a9\u529f\u80fd" android:textColor="#EEEEEE" android:textSize="11sp" android:layout_marginTop="4dp" />
         </LinearLayout>
     </GridLayout>
+
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u97f3\u91cf" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginTop="14dp" android:layout_marginBottom="4dp" />
     <SeekBar android:id="@+id/cc_volume" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:progress="60" />
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="\u4eae\u5ea6" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginTop="10dp" android:layout_marginBottom="4dp" />
