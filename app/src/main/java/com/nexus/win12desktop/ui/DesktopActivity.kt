@@ -33,9 +33,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * Main Desktop Activity - Windows 12 style launcher for Android TV.
- */
 class DesktopActivity : AppCompatActivity() {
 
     private lateinit var rootContainer: FrameLayout
@@ -105,7 +102,7 @@ class DesktopActivity : AppCompatActivity() {
         val apps = AppUtils.getLaunchableApps(this)
         desktopIconsContainer.removeAllViews()
 
-        apps.take(12).forEachIndexed { index, app ->
+        apps.take(16).forEachIndexed { index, app ->
             val iconView = LayoutInflater.from(this)
                 .inflate(R.layout.item_desktop_icon, desktopIconsContainer, false)
 
@@ -124,9 +121,9 @@ class DesktopActivity : AppCompatActivity() {
             val params = GridLayout.LayoutParams().apply {
                 width = resources.getDimensionPixelSize(R.dimen.desktop_icon_size)
                 height = ViewGroup.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(index % 6)
-                rowSpec = GridLayout.spec(index / 6)
-                setMargins(24, 24, 24, 24)
+                columnSpec = GridLayout.spec(index % 8)
+                rowSpec = GridLayout.spec(index / 8)
+                setMargins(12, 16, 12, 16)
             }
             desktopIconsContainer.addView(iconView, params)
         }
@@ -134,7 +131,7 @@ class DesktopActivity : AppCompatActivity() {
 
     private fun setupTaskbar() {
         startButton.setOnClickListener { toggleStartMenu() }
-        taskbar.alpha = 0.92f
+        taskbar.alpha = 0.96f
     }
 
     private fun setupStartMenu() {
@@ -142,7 +139,7 @@ class DesktopActivity : AppCompatActivity() {
         isStartMenuOpen = false
 
         val apps = AppUtils.getLaunchableApps(this)
-        appListRecycler.layoutManager = GridLayoutManager(this, 4)
+        appListRecycler.layoutManager = GridLayoutManager(this, 6)
         appListRecycler.adapter = AppListAdapter(apps) { app ->
             closeStartMenu()
             launchApp(app)
@@ -178,7 +175,7 @@ class DesktopActivity : AppCompatActivity() {
     private fun updateClock() {
         val now = Date()
         clockText.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(now)
-        dateText.text = SimpleDateFormat("MM\u6708dd\u65e5 EEEE", Locale.CHINA).format(now)
+        dateText.text = SimpleDateFormat("MM\u6708dd\u65e5", Locale.CHINA).format(now)
     }
 
     private fun startWallpaperAnimation() {
@@ -205,11 +202,15 @@ class DesktopActivity : AppCompatActivity() {
     private fun openStartMenu() {
         startMenuPanel.visibility = View.VISIBLE
         startMenuPanel.alpha = 0f
-        startMenuPanel.translationY = 40f
+        startMenuPanel.scaleX = 0.92f
+        startMenuPanel.scaleY = 0.92f
+        startMenuPanel.translationY = 24f
         startMenuPanel.animate()
             .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
             .translationY(0f)
-            .setDuration(220)
+            .setDuration(200)
             .start()
         isStartMenuOpen = true
     }
@@ -217,8 +218,10 @@ class DesktopActivity : AppCompatActivity() {
     private fun closeStartMenu() {
         startMenuPanel.animate()
             .alpha(0f)
-            .translationY(40f)
-            .setDuration(180)
+            .scaleX(0.94f)
+            .scaleY(0.94f)
+            .translationY(16f)
+            .setDuration(160)
             .withEndAction { startMenuPanel.visibility = View.GONE }
             .start()
         isStartMenuOpen = false
@@ -254,10 +257,9 @@ class DesktopActivity : AppCompatActivity() {
 
     private fun openAppInfo(packageName: String) {
         try {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.parse("package:$packageName")
-            }
-            startActivity(intent)
+            })
         } catch (e: Exception) {
             Toast.makeText(this, "\u65e0\u6cd5\u6253\u5f00\u5e94\u7528\u4fe1\u606f", Toast.LENGTH_SHORT).show()
         }
@@ -265,10 +267,9 @@ class DesktopActivity : AppCompatActivity() {
 
     private fun uninstallApp(packageName: String) {
         try {
-            val intent = Intent(Intent.ACTION_DELETE).apply {
+            startActivity(Intent(Intent.ACTION_DELETE).apply {
                 data = Uri.parse("package:$packageName")
-            }
-            startActivity(intent)
+            })
         } catch (e: Exception) {
             Toast.makeText(this, "\u65e0\u6cd5\u5378\u8f7d", Toast.LENGTH_SHORT).show()
         }
@@ -276,28 +277,19 @@ class DesktopActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (event == null) return super.onKeyDown(keyCode, event)
-
         mouseManager?.let {
-            if (it.isEnabled && it.onKeyDown(keyCode, event)) {
-                return true
-            }
+            if (it.isEnabled && it.onKeyDown(keyCode, event)) return true
         }
-
         return when (keyCode) {
             KeyEvent.KEYCODE_HOME -> true
             KeyEvent.KEYCODE_BACK -> {
-                if (isStartMenuOpen) {
-                    closeStartMenu()
-                    true
-                } else {
-                    Toast.makeText(this, "\u5df2\u5728\u684c\u9762\uff0c\u6309 Home \u952e\u53ef\u8fd4\u56de", Toast.LENGTH_SHORT).show()
+                if (isStartMenuOpen) { closeStartMenu(); true }
+                else {
+                    Toast.makeText(this, "\u5df2\u5728\u684c\u9762", Toast.LENGTH_SHORT).show()
                     true
                 }
             }
-            KeyEvent.KEYCODE_MENU -> {
-                toggleStartMenu()
-                true
-            }
+            KeyEvent.KEYCODE_MENU -> { toggleStartMenu(); true }
             else -> super.onKeyDown(keyCode, event)
         }
     }
@@ -305,9 +297,7 @@ class DesktopActivity : AppCompatActivity() {
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         if (event == null) return super.onKeyUp(keyCode, event)
         mouseManager?.let {
-            if (it.isEnabled && it.onKeyUp(keyCode, event)) {
-                return true
-            }
+            if (it.isEnabled && it.onKeyUp(keyCode, event)) return true
         }
         return super.onKeyUp(keyCode, event)
     }
@@ -326,11 +316,8 @@ class DesktopActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (isStartMenuOpen) {
-            closeStartMenu()
-        } else {
-            Toast.makeText(this, "NEXUS WIN12 \u684c\u9762\u8fd0\u884c\u4e2d", Toast.LENGTH_SHORT).show()
-        }
+        if (isStartMenuOpen) closeStartMenu()
+        else Toast.makeText(this, "NEXUS WIN12", Toast.LENGTH_SHORT).show()
     }
 }
 
